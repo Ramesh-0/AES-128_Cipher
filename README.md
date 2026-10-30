@@ -1,8 +1,8 @@
 # AES-128 Encryption and Decryption (From Scratch)
 
-A Python implementation of **AES-128** for learning and experimentation. It implements the AES algorithm directly, including mathematical generation of the standard AES S-box and inverse S-box. It does not call a third-party cryptography package.
+A Python implementation of **AES-128** for learning and experimentation. The project implements AES directly, including mathematical generation of the standard AES S-box and inverse S-box. It does not use a third-party cryptography package.
 
-> **Educational scope:** this project encrypts and decrypts one 128-bit block (16 bytes) using a 128-bit key. It is a learning implementation, not a production-ready encryption tool.
+> **Educational scope:** This project encrypts and decrypts one 128-bit block (16 bytes) using a 128-bit key. It is a learning implementation, not a production-ready encryption tool.
 
 ## 1. Features
 
@@ -10,126 +10,221 @@ A Python implementation of **AES-128** for learning and experimentation. It impl
 - Standard AES S-box generated from the GF(2^8) multiplicative inverse and affine transformation.
 - Inverse S-box generated from the forward S-box.
 - AES-128 key expansion (44 words / 11 round keys).
-- Separate modules for the AES core, S-box, key schedule, transformations, constants, and file handling.
+- Separate modules for the AES core, S-box, key schedule, transformations, and file handling.
 - Reads the key and plaintext from one input file.
-- Writes ciphertext and decrypted plaintext to an output file.
-- Checks that decryption recovers the original plaintext.
+- Writes the latest ciphertext and decryption result to an output file.
+- Verifies that decryption recovers the original plaintext.
+- Includes a command to test the generated S-box.
 
 ## 2. Project structure
 
 ```text
 AES_Project/
-├── main.py
+├── main.py                     # Runs encryption, decryption, and verification
 ├── input/
-│   └── input.txt
+│   └── input.txt               # Your AES key and plaintext (hexadecimal)
 ├── aes/
 │   ├── __init__.py
-│   ├── aes_core.py
-│   ├── constants.py
-│   ├── key_expansion.py
-│   ├── sbox.py
-│   └── transformations.py
+│   ├── aes_core.py             # AES-128 block encryption and decryption
+│   ├── constants.py            # Field polynomial and round constants
+│   ├── key_expansion.py        # Generates the 11 round keys
+│   ├── sbox.py                 # Generates S-box and inverse S-box
+│   └── transformations.py      # AES round transformations
 ├── utils/
 │   ├── __init__.py
-│   └── file_handler.py
+│   └── file_handler.py         # Reads input.txt and writes output.txt
 ├── output/
-│   └── .gitkeep
+│   └── .gitkeep                # Keeps the output directory in Git
 ├── requirements.txt
 └── README.md
 ```
 
-### File responsibilities
+### What each important file does
 
-| File | Responsibility |
+| File | Purpose |
 |---|---|
-| `main.py` | Coordinates input, encryption, decryption, verification, and output |
-| `input/input.txt` | Holds the AES key and plaintext in hexadecimal |
+| `main.py` | Reads input, calls AES encryption and decryption, prints results, and saves them |
+| `input/input.txt` | The only file you need to edit to provide your own key and plaintext |
 | `aes/sbox.py` | Generates the standard AES S-box and inverse S-box |
-| `aes/key_expansion.py` | Generates the 11 AES-128 round keys |
-| `aes/transformations.py` | Implements SubBytes, ShiftRows, MixColumns, and their inverses |
-| `aes/aes_core.py` | Implements the complete AES-128 block encryption/decryption flow |
-| `aes/constants.py` | Stores the field polynomial and round constants |
+| `aes/key_expansion.py` | Expands the 16-byte key into 11 round keys |
+| `aes/transformations.py` | Implements SubBytes, ShiftRows, MixColumns, and inverse transformations |
+| `aes/aes_core.py` | Combines the transformations into AES-128 encryption and decryption |
 | `utils/file_handler.py` | Parses the input file and writes the output file |
-| `output/output.txt` | Generated encryption/decryption results |
+| `output/output.txt` | Automatically generated results from the most recent run |
 
-## 3. Requirements
+## 3. Requirements and setup
 
 - Python 3.9 or later
-- No external Python packages
+- No third-party Python packages are required.
 
-Check your Python installation:
+Check your Python version:
 
 ```bash
 python --version
 ```
 
-## 4. Input format
+Download or clone the repository, open the project root folder in a terminal, and run the program from that folder. For example:
 
-Open `input/input.txt` and provide:
+```bash
+cd AES_Project
+python main.py
+```
+
+**Important:** Run `python main.py` from the project root (`AES_Project`), not from inside the `aes`, `utils`, `input`, or `output` folders. This ensures Python can resolve the package imports.
+
+## 4. How to enter your own key and plaintext
+
+Open `input/input.txt`. It contains two fields:
 
 ```text
 KEY=000102030405060708090A0B0C0D0E0F
 PLAINTEXT=00112233445566778899AABBCCDDEEFF
 ```
 
-Rules:
+Replace the hexadecimal values after `=` with your own values:
 
-- `KEY` must be exactly 32 hexadecimal characters (16 bytes).
-- `PLAINTEXT` must be exactly 32 hexadecimal characters (16 bytes).
-- Hexadecimal input is case-insensitive.
-- Spaces around values are ignored; spaces within a hexadecimal value are also removed.
-- Lines beginning with `#` are treated as comments.
-- The current implementation accepts one block only.
+```text
+KEY=YOUR_32_HEXADECIMAL_CHARACTERS
+PLAINTEXT=YOUR_32_HEXADECIMAL_CHARACTERS
+```
 
-The included values are the standard AES-128 known-answer test vector.
+The placeholders above are explanatory only; replace them with actual hexadecimal digits before running the program.
 
-## 5. Run the project
+### Input rules
 
-From the project root directory (`AES_Project`), run:
+- `KEY` must be exactly **32 hexadecimal characters** (16 bytes / 128 bits).
+- `PLAINTEXT` must be exactly **32 hexadecimal characters** (16 bytes / 128 bits).
+- Allowed characters are `0–9`, `A–F`, and `a–f`.
+- Do not include `0x` before the value.
+- Do not put quotation marks around the values.
+- The field names must be `KEY` and `PLAINTEXT`.
+- Blank lines and lines starting with `#` are ignored.
+- The program accepts one plaintext block at a time.
+
+For example, this is a valid input file:
+
+```text
+# My AES-128 test
+KEY=2B7E151628AED2A6ABF7158809CF4F3C
+PLAINTEXT=6BC1BEE22E409F96E93D7E117393172A
+```
+
+Save `input/input.txt` after editing it.
+
+**Key safety:** Use test keys only. Do not put passwords, production encryption keys, or confidential plaintext in a public GitHub repository. The included sample values are public test data.
+
+## 5. How the output file works
+
+You do not need to create or edit `output/output.txt` manually. When you run:
 
 ```bash
 python main.py
 ```
 
-The program will:
+the program:
 
-1. Read `KEY` and `PLAINTEXT` from `input/input.txt`.
-2. Expand the 128-bit key into 11 round keys.
-3. Encrypt the 16-byte plaintext.
-4. Decrypt the resulting ciphertext.
-5. Compare the decrypted block with the original plaintext.
-6. Print the result and save it to `output/output.txt`.
+1. Reads the current `KEY` and `PLAINTEXT` from `input/input.txt`.
+2. Expands the key into 11 AES-128 round keys.
+3. Encrypts the plaintext and calculates the ciphertext.
+4. Decrypts that ciphertext using the same key.
+5. Compares the decrypted plaintext with the original plaintext.
+6. Prints the results in the terminal.
+7. Writes the same results to `output/output.txt`.
 
-Do not run `main.py` from inside the `aes` or `utils` directory. Run it from the project root so the package imports resolve correctly.
+### Does the output change every time?
 
-## 6. Expected result
+**Yes. `output/output.txt` is overwritten on every successful run.** It contains the results of the most recent execution, not a history of previous executions.
 
-For the included test vector, the expected ciphertext is:
+- If you change the plaintext, the ciphertext will normally change.
+- If you change the key, the ciphertext will normally change.
+- If you keep both key and plaintext unchanged, this implementation produces the same ciphertext again because it encrypts a single block deterministically.
+- The decrypted plaintext should match the input plaintext when encryption and decryption work correctly.
+
+Example:
+
+**First run — input**
 
 ```text
-69C4E0D86A7B0430D8CDB78070B4C55A
+KEY=000102030405060708090A0B0C0D0E0F
+PLAINTEXT=00112233445566778899AABBCCDDEEFF
 ```
 
-Expected console output:
+**First run — output**
 
 ```text
-========== AES-128 ENCRYPTION ==========
-Key:        000102030405060708090A0B0C0D0E0F
-Plaintext:  00112233445566778899AABBCCDDEEFF
 Ciphertext: 69C4E0D86A7B0430D8CDB78070B4C55A
-
-========== AES-128 DECRYPTION ==========
-Ciphertext:          69C4E0D86A7B0430D8CDB78070B4C55A
 Decrypted plaintext: 00112233445566778899AABBCCDDEEFF
-
 Verification: SUCCESS
 ```
 
-The output is also saved in `output/output.txt`.
+**Second run — after changing the input**
 
-## 7. AES-128 algorithm overview
+```text
+KEY=00000000000000000000000000000000
+PLAINTEXT=00000000000000000000000000000000
+```
 
-AES-128 operates on a 128-bit (16-byte) data block and a 128-bit key. The 16-byte input is arranged into a 4 × 4 byte state matrix in column-major order.
+**Second run — output**
+
+```text
+Ciphertext: 66E94BD4EF8A2C3B884CFA59CA342B2E
+Decrypted plaintext: 00000000000000000000000000000000
+Verification: SUCCESS
+```
+
+After the second run, `output/output.txt` contains the second run's results. The first run's output is replaced. Copy or rename the output file before running again if you want to preserve an earlier result.
+
+## 6. Run the project
+
+From the project root:
+
+```bash
+python main.py
+```
+
+The console displays the encryption and decryption results. The same report is saved to:
+
+```text
+output/output.txt
+```
+
+A successful run should end with:
+
+```text
+Verification: SUCCESS
+```
+
+If the input is missing or invalid, the program prints an error message explaining what needs to be corrected.
+
+## 7. Test the AES S-box
+
+The S-box is generated in `aes/sbox.py`; it is not loaded from a hard-coded lookup table. Run this command from the project root to inspect and validate it:
+
+```bash
+python -c "from aes.sbox import SBOX, INV_SBOX; print('S-box size:', len(SBOX)); print('First 16 S-box values:', ' '.join(f'{x:02X}' for x in SBOX[:16])); print('Inverse S-box size:', len(INV_SBOX)); print('Inverse mapping valid:', all(INV_SBOX[SBOX[i]] == i for i in range(256)))"
+```
+
+Expected output:
+
+```text
+S-box size: 256
+First 16 S-box values: 63 7C 77 7B F2 6B 6F C5 30 01 67 2B FE D7 AB 76
+Inverse S-box size: 256
+Inverse mapping valid: True
+```
+
+What this test checks:
+
+- The forward S-box has 256 entries, one for each possible byte.
+- The first 16 values match the beginning of the standard AES S-box.
+- The inverse S-box also has 256 entries.
+- For every byte `i`, applying the forward S-box and then the inverse S-box returns the original byte: `INV_SBOX[SBOX[i]] == i`.
+
+You can also open `aes/sbox.py` to study how the S-box is generated mathematically.
+
+## 8. AES-128 algorithm overview
+
+AES-128 operates on a 128-bit (16-byte) data block and a 128-bit key. The 16 input bytes are arranged into a 4 × 4 state matrix in column-major order.
 
 ### Encryption
 
@@ -152,11 +247,11 @@ Decryption applies the inverse transformations in reverse round order:
 
 The final inverse round omits InvMixColumns.
 
-## 8. How the original AES S-box is generated
+## 9. How the original AES S-box is generated
 
-The S-box is not loaded from a hard-coded lookup table. It is constructed for every possible byte value:
+The S-box is constructed for every possible byte value:
 
-1. Find the multiplicative inverse in GF(2^8). The zero byte maps to zero for this construction.
+1. Find the multiplicative inverse in GF(2^8). Zero maps to zero for this construction.
 2. Use the AES irreducible polynomial:
 
    `x^8 + x^4 + x^3 + x + 1`
@@ -169,14 +264,7 @@ The S-box is not loaded from a hard-coded lookup table. It is constructed for ev
    where `b` is the multiplicative inverse and `ROTLn` is an 8-bit left rotation by `n` positions.
 4. Build the inverse S-box by reversing the mapping.
 
-The generated S-box is the standard AES S-box. For a quick sanity check, its first entries are:
-
-```text
-63 7C 77 7B F2 6B 6F C5
-30 01 67 2B FE D7 AB 76
-```
-
-## 9. AES-128 key expansion
+## 10. AES-128 key expansion
 
 AES-128 expands the original 16-byte key into 44 words, each 4 bytes long. Every group of four words forms one 16-byte round key, giving 11 round keys in total (round 0 through round 10).
 
@@ -187,7 +275,7 @@ The key schedule uses:
 - Rcon
 - XOR with the word four positions earlier
 
-## 10. Validation and troubleshooting
+## 11. Validation and troubleshooting
 
 | Problem | What to check |
 |---|---|
@@ -195,11 +283,10 @@ The key schedule uses:
 | Invalid hexadecimal input | Use only hexadecimal characters `0–9`, `A–F` |
 | Key length error | Provide exactly 32 hexadecimal characters |
 | Plaintext length error | Provide exactly 32 hexadecimal characters |
-| Import error | Confirm the `aes/` and `utils/` directories contain `__init__.py` and run `python main.py` from the root |
+| Import error | Confirm `aes/` and `utils/` contain `__init__.py`; run `python main.py` from the root |
+| S-box test import error | Run the S-box test command from the project root |
 
-A successful run should print `Verification: SUCCESS`.
-
-## 11. Important security limitations
+## 12. Important security limitations
 
 This project is intended for education and cryptographic experimentation.
 
@@ -208,11 +295,11 @@ This project is intended for education and cryptographic experimentation.
 - It does not use authenticated encryption or provide integrity protection.
 - It does not implement padding.
 - It is not designed to resist timing or other side-channel attacks.
-- The example key is a public test vector and must never be used to protect real data.
+- The example key is public test data and must never be used to protect real information.
 
 For real applications, use a vetted cryptographic library and an authenticated encryption mode such as AES-GCM, with secure key generation and management.
 
-## 12. Possible future extensions
+## 13. Possible future extensions
 
 - Support multiple blocks.
 - Add PKCS#7 padding where an appropriate block mode requires it.
@@ -222,6 +309,6 @@ For real applications, use a vetted cryptographic library and an authenticated e
 - Add round-by-round state tracing for cryptanalysis experiments.
 - Compare the generated S-box and intermediate values against published AES test vectors.
 
-## 13. Reference
+## 14. Reference
 
 - NIST, **FIPS 197: Advanced Encryption Standard (AES)**: https://doi.org/10.6028/NIST.FIPS.197
