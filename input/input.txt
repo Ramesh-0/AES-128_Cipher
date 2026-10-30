@@ -1,0 +1,4 @@
+# AES-128 input: use exactly 32 hexadecimal characters for each value.
+# This is the standard AES-128 known-answer test vector.
+KEY=000102030405060708090A0B0C0D0E0F
+PLAINTEXT=00112233445566778899AABBCCDDEEFF
